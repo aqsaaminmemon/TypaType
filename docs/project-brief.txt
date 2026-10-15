@@ -1,0 +1,465 @@
+1. Project objective
+Build TypaType, a small C++ desktop typing game with a cute, friendly violet interface.
+Use the approved design as the visual reference. The application should feature:
+- A full-width typing board.
+- Difficulty and duration selectors above the board.
+- A small white cartoon kitten between the selectors.
+- Three difficulty levels.
+- Timed rounds containing a fixed number of random words.
+- Clear typing feedback and correction rules.
+- WPM and accuracy results.
+- Locally saved personal progress.
+- Light/dark themes, adjustable text size, and sound controls.
+Implement the actual game logic, graphics, persistence, and results. Any sample scores or presentation controls in the design preview must be replaced with real application behaviour.
+2. Technology stack
+Use:
+- C++17 or newer for application logic.
+- Qt 6 Widgets for the desktop interface.
+- QPainter for the typing display, highlights, caret, and progress chart.
+- Qt SVG for the kitten artwork and small icons.
+- Qt Multimedia / QSoundEffect for short sound effects.
+- CMake for building the application.
+Keep game logic separate from interface rendering.
+The relevant graphics tools are documented in Qt Widgets, QPainter, Qt SVG, and QSoundEffect.
+3. Scope
+Include only the agreed first-version features.
+Do not add:
+- Accounts or login.
+- Multiplayer.
+- Online leaderboards.
+- Cloud synchronisation.
+- Coins, shops, or unlockable items.
+- Daily challenges or streaks.
+- Custom text entry.
+- Additional languages.
+- Extra game modes.
+Use one local player profile.
+4. Visual style
+Create a soft, welcoming violet theme with:
+- Pale lavender backgrounds.
+- Violet accents and buttons.
+- Slightly tinted white cards.
+- Rounded corners.
+- Gentle borders and subtle shadows.
+- Spacious, readable typography.
+- A white kitten with pink cheeks and a violet bow.
+Keep the typing area visually calm. Decorative elements must not cover the words or compete with the caret.
+Use this palette as a starting point:
+Element	Light mode	Dark mode
+Main background	#F7F0FF	#241C35
+Card background	#FFFAFF	#302540
+Main text	#392553	#F8EFFF
+Secondary text	#776289	#C8B7DF
+Borders	#E9D7F4	#51405E
+Soft accent surface	#F0E3FF	#423052
+Primary violet	#8553C2	#CAA4F6
+Correct-character accent	#9265C8	#C7A6F8
+Error text	#B43E57	#FF9CB1
+
+
+Adjust colours when necessary to maintain readable contrast.
+5. Main screen arrangement
+Use this layout:
+ TypaType 🐾                         Play   Progress   Settings
+
+
+ A little practice. A little progress.
+ Get comfy. Your little cheerleader is right here.
+
+
+       Difficulty             Small kitten             Duration
+       [Simple       ˅]       face and paws            [30 seconds ˅]
+                              You’ve got this!
+
+
+ ┌───────────────────────────────────────────────────────────────┐
+ │ English · Simple                                        30s  │
+ │                                                               │
+ │ Random typing words appear here across the full available      │
+ │ width, with clear spacing and character-level feedback.        │
+ │                                                               │
+ │ Start typing to begin                                         │
+ └───────────────────────────────────────────────────────────────┘
+
+ Enter: next word                                      ↻ Restart
+Requirements:
+- Keep the app logo on the header’s left.
+- Put Play, Progress, and Settings navigation on the right.
+- Place the controls above the typing board.
+- Arrange them as Difficulty → kitten → Duration.
+- Keep the kitten smaller than in the original sidebar design.
+- Make the typing board span the full available content width.
+- Do not put difficulty or duration in a sidebar.
+- Place Restart below the board, aligned to the right.
+- Keep the selected options visible while typing.
+6. Remove these captions
+Do not display:
+- “Your cozy typing corner.”
+- “A little kinder. A little calmer.”
+- The Backspace instruction beneath the board.
+Keep the short “Enter: next word” hint.
+Removing the Backspace caption must not remove or change Backspace functionality.
+The actual application must not contain preview-only controls such as “Preview result screen” or labels such as “Sample result.”
+7. Kitten design
+Create an original white cartoon kitten showing only its face and front paws.
+Do not show a full body or tail.
+Include:
+- A rounded white face.
+- Small ears with pale pink interiors.
+- Expressive eyes.
+- Pink cheeks.
+- A tiny nose.
+- A gentle smile.
+- A violet bow beside one ear.
+- Two small white paws with subtle pink paw pads.
+- A lavender-grey outline so the white face remains visible in light mode.
+Place the kitten between the difficulty and duration selectors.
+Use three expressions:
+- Welcome: open eyes, a gentle smile, paws resting below the face.
+- Encouragement: smiling eyes and a small paw gesture.
+- Celebration: happy eyes and raised paws.
+Use brief, gentle gestures rather than continuous movement.
+During play, the kitten can give a short cheer after every ten newly completed correct words. Trigger each milestone once per round.
+At completion, show a friendly celebration regardless of whether the player achieved a personal best.
+Example messages:
+- “You’ve got this!”
+- “Nice work!”
+- “Keep going!”
+- “A new personal best!”
+Only announce a personal best when the saved results support that claim.
+Animations must not block typing or interfere with the timer.
+8. Difficulty selection dialog
+Show a compact button containing the current difficulty and a downward chevron.
+Clicking it opens a selection dialog titled:
+Choose difficulty
+
+Provide exactly three options:
+1. Simple
+2. Punctuation
+3. Punctuation + Numbers
+Highlight the current selection.
+Choosing an option must:
+- Apply it immediately.
+- Close the dialog.
+- Generate a fresh word set.
+- Reset the round to its waiting state.
+Allow dismissal with:
+- The close button.
+- Escape.
+- Clicking outside the dialog.
+Cancelling must preserve the existing selection.
+Support keyboard navigation and return focus appropriately after closing.
+9. Duration selection dialog
+Show the current duration in a compact button above the typing board.
+Clicking it opens a dialog titled:
+Choose duration
+
+Provide exactly:
+- 15 seconds
+- 30 seconds
+- 60 seconds
+Highlight the current selection.
+Selecting a duration applies it, closes the dialog, and prepares a fresh round.
+Every duration must work with every difficulty.
+10. Defaults and word counts
+On every fresh application launch:
+- Select Simple difficulty.
+- Select 30 seconds.
+- Generate 30 words.
+- Wait for the first typed character before starting the countdown.
+The word count must match the chosen duration:
+Duration	Generated words
+15 seconds	15
+30 seconds	30
+60 seconds	60
+
+
+Generate exactly that many target tokens.
+Punctuation attached to a word does not create an additional word. A standalone number occupies one token in the allotted count.
+Do not append extra words during the round.
+Restore saved appearance, text-size, and sound preferences. Difficulty and duration still return to Simple and 30 seconds after reopening the application.
+11. Random vocabulary
+Use a varied dictionary of familiar English words.
+Include:
+- Nouns: garden, friend, cloud, book.
+- Main verbs: write, learn, smile, walk.
+- Helping verbs: is, are, was, have, does, can, will, should.
+- Adjectives: gentle, bright, happy, quiet.
+- Pronouns: we, they, she, you.
+- Adverbs: slowly, often, always.
+- Prepositions: under, near, with.
+- Articles and conjunctions: the, a, and, but, because.
+Generate random word sequences rather than a predictable paragraph. The sequences do not need to form grammatical sentences.
+Requirements:
+- Use lowercase English words.
+- Include helping verbs and adjectives regularly.
+- Avoid immediate duplicate words.
+- Avoid identical complete sequences in consecutive rounds.
+- Generate fresh text after Restart or Play Again.
+- Keep target text unchanged during an active round.
+- Bundle the dictionary locally.
+12. Difficulty-specific text
+Simple
+- Lowercase words only.
+- No punctuation.
+- No numbers.
+Example:
+should gentle friend write sunny they cloud have
+Punctuation
+- Lowercase words.
+- Punctuation attached to some words.
+- No numbers.
+Example:
+should gentle, friend write! sunny they cloud.
+Punctuation + Numbers
+- Lowercase words.
+- Punctuation.
+- Occasional short whole numbers.
+Example:
+should 27 gentle, friend write! 410 sunny
+Use ordinary punctuation such as:
+. , ! ? ' " ( )
+Ensure the Punctuation level contains punctuation. Ensure the highest level contains both punctuation and numbers.
+13. Timer behaviour
+Before the round starts:
+- Show the selected duration.
+- Show “Start typing to begin.”
+- Keep the countdown stopped.
+Start the timer on the first printable character entered, including an incorrect character.
+Do not start it from empty Enter, empty Backspace, clicking the board, or pressing modifier keys.
+Use a monotonic clock for timing.
+When the timer expires:
+1. Stop accepting typing input.
+2. Freeze the final round state.
+3. Calculate WPM and accuracy.
+4. Save the completed round once.
+5. Immediately show results.
+Keep timer expiry as the finish condition. If the player submits all allotted words early, do not generate more words. Allow only corrections permitted by the Backspace rules until the timer expires.
+14. Enter behaviour
+Enter advances to the next word even when the current word contains mistakes.
+When Enter submits a nonempty word:
+- Compare the typed text with its target.
+- Lock it if it is correct.
+- Keep it editable if it is incorrect.
+- Advance to the next word.
+Ignore Enter on an empty word.
+Enter is the word-advance key. Space must not silently submit a word; a space entered inside the current word is an extra character and should be marked accordingly.
+After the last target word is submitted, do not create another target word.
+15. Backspace behaviour
+Implement these rules:
+- Within the active word, Backspace deletes the previous character.
+- From an empty active word, Backspace may return to the immediately preceding word if that word is editable.
+- Correct submitted words are locked.
+- Backspace cannot edit a locked word.
+- Backspace cannot cross a locked word to reach an earlier mistake.
+When returning to an editable previous word, place the cursor at its end and delete its last character with that Backspace press.
+Preserve later typed words when revisiting an earlier editable word.
+Enter after editing a revisited word advances to the following word, retaining any existing input there.
+A corrected word becomes locked when submitted again with Enter.
+Example:
+Target: cat dog moon
+Typed:  cat dpg
+The player can return to correct dpg, but cannot edit the correctly submitted cat.
+If a correct word lies between the current position and an earlier mistake, it forms a boundary that Backspace cannot cross.
+Apply the same rule after the final word: Backspace may return from the end position only when the immediately preceding submitted word is incorrect.
+16. Typing feedback
+Render character-level feedback:
+- Upcoming characters: readable muted text.
+- Correct characters: violet accent.
+- Incorrect characters: coral-red with a subtle background highlight.
+- Extra characters: clearly marked as errors.
+- Missing characters in submitted words: visibly marked as missing.
+- Current position: a clear caret.
+Use exact matching for punctuation and numbers.
+Keep incorrect submitted words visibly marked until corrected.
+Do not use harsh flashing, screen shaking, or loud error sounds.
+Use a readable monospace font for typing text and a clean interface font for labels.
+Wrap text within the full-width board. Keep the current word visible as the player advances or revisits previous input.
+17. Restart and navigation
+Restart must:
+- Discard the current attempt.
+- Preserve the selected difficulty and duration.
+- Generate a fresh word set with the correct count.
+- Reset the timer and all counters.
+- Return to the waiting state.
+Do not save restarted attempts.
+Changing difficulty or duration also discards an active attempt and prepares a fresh round.
+Leaving Play during an active round abandons that attempt. Returning to Play prepares a fresh waiting round.
+Do not add pause-and-resume functionality.
+If typing focus is lost while the player remains on Play, the timer continues.
+18. WPM calculation
+Use the five-character word convention:
+WPM = (credited characters / 5) / duration in minutes
+For completed rounds, use the selected duration: 15, 30, or 60 seconds.
+Credited characters are:
+- Characters matching their expected positions in the final stored input.
+- Plus one separator for each submitted word whose final text exactly matches its target.
+Include correct characters in the active unfinished word when time expires.
+Do not credit incorrect, extra, missing, or erased characters.
+Calculate WPM from the final input state so repeatedly typing and deleting characters does not inflate speed.
+Keep full precision internally and display one decimal place.
+Do not apply difficulty multipliers.
+19. Accuracy calculation
+Use:
+Accuracy = correct character attempts / total character attempts × 100
+Each printable character insertion counts as an attempt.
+An attempt is correct only when the inserted character matches the expected character at that position.
+Include letters, punctuation, and numbers.
+Do not count Enter, Backspace, modifier keys, navigation keys, or interface shortcuts as character attempts.
+Correcting an error must not erase that mistake from the statistics.
+For example, ten wrong character attempts remain ten wrong attempts even after the player deletes or fixes them.
+Missing characters should be highlighted visually, but must not create fictional keystroke attempts.
+Handle zero attempts safely.
+Display accuracy to one decimal place.
+20. Results screen
+Show results immediately after timer expiry.
+Include:
+- WPM.
+- Accuracy.
+- Selected difficulty.
+- Selected duration.
+- A kitten message.
+- Comparison with the previous completed round.
+- A personal-best indicator when applicable.
+Make WPM and accuracy the most prominent information.
+Provide:
+- Play Again as the primary button.
+- View Progress as the secondary button.
+Play Again preserves the selected options, generates the matching number of fresh words, and waits for the first typed character.
+Do not save or compare abandoned rounds.
+21. Unified progress history
+Keep one unified history covering all difficulties and durations.
+Do not separate comparisons by difficulty or apply difficulty bonuses.
+Keep WPM and accuracy as separate metrics rather than inventing a combined score.
+Compare the latest round with the immediately preceding completed round:
+WPM change = latest WPM − previous WPM
+Accuracy change = latest accuracy − previous accuracy
+Describe accuracy differences in percentage points.
+Track:
+- Best WPM, with that round’s accuracy.
+- Best accuracy, with that round’s WPM.
+- Completed-round count.
+Show difficulty and duration alongside saved results for context.
+For the first round, display “Your first recorded round” instead of inventing a comparison.
+22. Progress chart
+Provide a line chart with a toggle between:
+- WPM
+- Accuracy
+Use completed rounds in chronological order on the horizontal axis.
+Use WPM or accuracy on the vertical axis. The accuracy scale should cover 0–100%.
+Initially show the latest 20 completed rounds.
+Connect actual observations with straight segments. Do not invent intermediate measurements.
+Selecting or hovering over a point should reveal:
+- Date and time.
+- WPM.
+- Accuracy.
+- Difficulty.
+- Duration.
+- Word count.
+Mark personal-best points subtly.
+Include a recent-results list below the chart.
+Handle empty history and a single recorded round correctly. Empty history can show:
+Complete your first round to see your progress here.
+
+Use real saved results throughout this screen.
+23. Settings
+Provide:
+- Light and dark themes.
+- Adjustable typing-text size.
+- Typing-sound enable/disable.
+- Celebration-sound enable/disable.
+- A volume control.
+Suggested typing-text sizes:
+- Minimum: 22 pixels.
+- Maximum: 40 pixels.
+- Default: 30 pixels.
+Show a live text-size preview.
+Apply theme and size changes immediately.
+Save settings locally and restore them after reopening.
+Use short, quiet sound effects. Muted categories must not play.
+24. Local saving
+Use local application storage.
+Save preferences through QSettings or an equivalent Qt-supported mechanism.
+Save completed-round history as structured JSON.
+Each result should contain:
+Unique round ID
+Completion timestamp
+Difficulty
+Duration
+Target word count
+Credited characters
+Total character attempts
+Correct character attempts
+WPM
+Accuracy
+Schema version
+Requirements:
+- Save completed rounds only.
+- Save each round once.
+- Preserve full-precision scores.
+- Use safe writes to avoid partially written files.
+- Validate loaded data.
+- Skip invalid entries without crashing.
+- Do not silently overwrite unreadable history with an empty file.
+- Show a small understandable message if saving fails.
+The app must work offline.
+25. Architecture
+Keep the project simple, with clear responsibilities:
+- MainWindow: navigation and application layout.
+- PlayPage: controls, kitten, typing board, and Restart.
+- TypingWidget: keyboard input and character rendering.
+- GameSession: state, timing, locking rules, and scoring counters.
+- WordGenerator: vocabulary, randomisation, difficulty, and exact word counts.
+- ResultsPage: results and Play Again.
+- ProgressPage: comparisons, history, and chart.
+- HistoryStore: saved completed rounds.
+- SettingsStore: saved preferences.
+- ThemeManager: colours and styling.
+- MascotWidget: face, paws, expressions, and gestures.
+- SoundManager: playback and volume.
+Use clear session states:
+Ready
+Running
+Completed
+Keep input and scoring logic independent of painting.
+26. Verification
+Verify these behaviours:
+- Startup selects Simple, 30 seconds, and 30 words.
+- The three durations produce exactly 15, 30, and 60 target tokens.
+- All durations work with all difficulties.
+- Punctuation and numbers do not increase the allotted token count.
+- Restart and Play Again produce fresh text.
+- The first printable character starts the timer.
+- Timer expiry rejects further typing and saves results once.
+- Enter advances after incorrect words.
+- Correct submitted words lock.
+- Backspace revisits adjacent incorrect words.
+- Backspace cannot cross correct submitted words.
+- Revisiting a word preserves later input.
+- Corrected mistakes remain in accuracy statistics.
+- Deleted characters do not inflate WPM.
+- Completed word sets do not receive extra words.
+- Abandoned rounds are not saved.
+- Progress combines all difficulties.
+- Settings survive reopening.
+- The removed captions are absent.
+- The kitten shows only its face and paws.
+- The kitten remains between the selectors.
+- The typing board fills the available content width.
+- Both themes remain readable.
+- Resizing does not overlap or clip essential controls.
+Use focused automated checks for the input rules, generation counts, timing, and scoring. Check layout, focus, graphics, and audio manually.
+27. Delivery
+Provide:
+- Complete C++ source.
+- CMake configuration.
+- Kitten and icon assets.
+- Sound assets.
+- Bundled vocabulary.
+- Build and run instructions.
+- Explanation of typing controls and score calculations.
+- Saved-data locations.
+- Verification results and remaining limitations.
+Inspect the existing project before implementation and preserve relevant existing work.
+Do not claim successful compilation or testing without performing those checks.
+Match the approved violet design closely, including its spacing, small kitten, selector dialogs, and full-width typing board.
